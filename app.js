@@ -17,7 +17,7 @@ async function enviarFormulario(evento) {
     salida.innerText = "Enviando...";
     try {
         // Enviar los datos a la API
-        const respuesta = await fetch("API/saludar.php", {
+        const respuesta = await fetch("api/saludar.php", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
