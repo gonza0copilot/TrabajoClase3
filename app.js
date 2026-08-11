@@ -13,16 +13,34 @@ async function enviarFormulario(evento) {
         nombre: nombre,
         edad: edad
     };
-    // Enviar los datos a la API
-    const respuesta = await fetch("api/saludar.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(datos)
-    });
-    // Convertir la respuesta a un objeto
-    const resultado = await respuesta.json();
-    // Mostrar el mensaje
-    document.getElementById("respuesta").innerText = resultado.mensaje;
+    const salida = document.getElementById("respuesta");
+    salida.innerText = "Enviando...";
+    try {
+        // Enviar los datos a la API
+        const respuesta = await fetch("API/saludar.php", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(datos)
+        });
+        if (!respuesta.ok) {
+            const text = await respuesta.text();
+            salida.innerText = `Error del servidor: ${respuesta.status} ${respuesta.statusText} — ${text}`;
+            return;
+        }
+        // Intentar parsear JSON (puede fallar si el servidor no devolvió JSON)
+        let resultado;
+        try {
+            resultado = await respuesta.json();
+        } catch (e) {
+            const text = await respuesta.text();
+            salida.innerText = `Respuesta no JSON: ${text}`;
+            return;
+        }
+        // Mostrar el mensaje (fallback si la clave no existe)
+        salida.innerText = resultado.mensaje ?? JSON.stringify(resultado);
+    } catch (err) {
+        salida.innerText = `Error de red: ${err.message}`;
+    }
 }
